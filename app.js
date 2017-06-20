@@ -2,6 +2,7 @@ const express = require('express')
 const bodyParser = require('body-parser')
 const mongoose = require('mongoose')
 const books = require('./routes/books.js')
+const customers = require('./routes/customers.js')
 
 mongoose.connect('mongodb://localhost/library', ()=>{
   console.log(`Connect to mongodb database`);
@@ -14,6 +15,7 @@ app.use(bodyParser.json())
 app.use(bodyParser.urlencoded({extended: false}))
 
 app.use('/books', books)
+app.use('/customers', customers)
 
 
 app.listen(3000)
