@@ -21,6 +21,7 @@ module.exports = {
 
   read: (req, res)=>{
     Book.find((err, data)=>{
+      console.log(data);
       if(!err) {
         res.send(data)
       } else {
@@ -30,18 +31,22 @@ module.exports = {
   },
 
   update: (req, res)=>{
-    Book.findOneAndUpdate({_id: req.params.id}, {$set :{
-      isbn: req.body.isbn,
-      title: req.body.title,
-      author: req.body.author,
-      category: req.body.category,
-      stock: req.body.stock
-    }}, {new: true}, (err, result)=>{
+    Book.findById(req.params.id, (err, result)=>{
+      console.log(result);
+      var bookUpdate = new Book({
+      isbn: req.body.isbn || result.isbn,
+      title: req.body.title || result.title,
+      author: req.body.author || result.author,
+      category: req.body.category || result.category,
+      stock: req.body.stock || result.stock
+    })
+    bookUpdate.save((err, result)=>{
       if(!err){
         res.send(result)
       } else {
         res.send(err)
       }
+    })
     })
   },
 
