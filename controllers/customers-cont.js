@@ -32,14 +32,14 @@ module.exports = {
   update: (req, res)=>{
     Customer.findById(req.params.id, (err, result)=>{
       console.log(result);
-      var customerUpdate = new Customer({
+      var customerUpdate = {
       name: req.body.name || result.name,
       memberid: req.body.memberid || result.memberid,
       address: req.body.address || result.address,
       zipcode: req.body.zipcode || result.zipcode,
       phone: req.body.phone || result.phone
-    })
-    customerUpdate.save((err, result)=>{
+    }
+    Customer.save({_id:req.params.id}, {$set: customerUpdate}, {new: true}, (err, result)=>{
       if(!err){
         res.send(result)
       } else {

@@ -5,6 +5,7 @@ var transactionsControllers = require('../controllers/transaction-cont.js')
 
 router.post('/', transactionsControllers.create)
 router.get('/', transactionsControllers.read)
+router.get('/:id', transactionsControllers.findOne)
 router.put('/:id', transactionsControllers.update)
 router.delete('/:id', transactionsControllers.delete)
 

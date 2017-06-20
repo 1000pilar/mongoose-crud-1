@@ -21,30 +21,7 @@ function dueDate(n){
     console.log(totalCharge);
     return totalCharge;
   }
-  function updateStock(book_id){
-    let updateBook = (req, res)=> {
-    Book.findById(book_id, (err, result)=>{
-      console.log(result);
-      var bookUpdate = new Book({
-      isbn: req.body.isbn || result.isbn,
-      title: req.body.title || result.title,
-      author: req.body.author || result.author,
-      category: req.body.category || result.category,
-      stock: result.stock - 1
-    })
-    bookUpdate.save((err, result)=>{
-      if(!err){
-        console.log(result)
-      } else {
-        console.log(err)
-      }
-    })
-    })
-  }
-  updateBook(req, res)
-  }
 module.exports = {
   dueDate,
-  countFine,
-  updateStock
+  countFine
 }

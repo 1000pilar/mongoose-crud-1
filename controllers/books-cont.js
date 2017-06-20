@@ -33,14 +33,14 @@ module.exports = {
   update: (req, res)=>{
     Book.findById(req.params.id, (err, result)=>{
       console.log(result);
-      var bookUpdate = new Book({
+      var bookUpdate = {
       isbn: req.body.isbn || result.isbn,
       title: req.body.title || result.title,
       author: req.body.author || result.author,
       category: req.body.category || result.category,
       stock: req.body.stock || result.stock
-    })
-    bookUpdate.save((err, result)=>{
+     }
+    Book.update({_id: req.params.id}, {$set: bookUpdate}, {new: true}, (err, result)=>{
       if(!err){
         res.send(result)
       } else {

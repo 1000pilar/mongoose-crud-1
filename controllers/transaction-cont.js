@@ -1,5 +1,7 @@
 var Transaction = require('../models/transaction.js')
+var Book = require('../models/book.js')
 var helper = require('../helpers/transactionLibrary.js')
+
 
 module.exports = {
   create: (req, res)=>{
@@ -12,7 +14,23 @@ module.exports = {
       fine: helper.countFine(req.body.in_date, req.body.days),
       booklist: req.body.booklist
     })
-    helper.updateStock(req.body.booklist)
+    Book.findById(req.body.booklist, (err, result)=>{
+      // console.log(result);
+      var bookUpdate = {
+      isbn: req.body.isbn || result.isbn,
+      title: req.body.title || result.title,
+      author: req.body.author || result.author,
+      category: req.body.category || result.category,
+      stock: result.stock - 1
+      }
+      Book.update({_id: req.body.booklist}, {$set: bookUpdate}, {new: true}, (err, result)=>{
+        if(!err){
+          console.log(result)
+        } else {
+          console.log(err)
+        }
+      })
+    })
     newTransaction.save((err, transaction)=>{
       if(!err){
         res.send(transaction)
@@ -32,23 +50,35 @@ module.exports = {
     })
   },
 
+  findOne: (req, res)=>{
+    Transaction.findOne({_id: req.params.id})
+    .populate('booklist')
+    .exec(function(err, transaction){
+      if(!err) {
+        res.send(transaction)
+      } else {
+        res.send(err)
+      }
+    })
+  },
+
   update: (req, res)=>{
     Transaction.findById(req.params.id, (err, result)=>{
-      var newTransaction = new Transaction({
+      var newTransaction = {
         memberid: req.body.memberid || result.memberid,
         days: req.body.days || result.days,
         due_date: helper.dueDate(req.body.days) || result.due_date,
         in_date: req.body.in_date || result.in_date,
         fine: helper.countFine(req.body.in_date, req.body.days) || result.fine,
         booklist: req.body.booklist || result.booklist
-      })
-    newTransaction.save((err, result)=>{
-      if(!err){
-        res.send(result)
-      } else {
-        res.send(err)
       }
-    })
+      Transaction.update(req.params.id, {$set: newTransaction}, {new: true}, (err, result)=>{
+        if(!err){
+          res.send(result)
+        } else {
+          res.send(err)
+        }
+      })
     })
   },
 
