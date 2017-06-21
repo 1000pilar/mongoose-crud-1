@@ -6,36 +6,41 @@ var helper = require('../helpers/transactionLibrary.js')
 module.exports = {
   create: (req, res)=>{
     console.log(req.body.days);
-    var newTransaction = new Transaction({
-      memberid: req.body.memberid,
-      days: req.body.days,
-      due_date: new Date(helper.dueDate(req.body.days)),
-      in_date: req.body.in_date,
-      fine: helper.countFine(req.body.in_date, req.body.days),
-      booklist: req.body.booklist
-    })
     Book.findById(req.body.booklist, (err, result)=>{
       // console.log(result);
-      var bookUpdate = {
-      isbn: req.body.isbn || result.isbn,
-      title: req.body.title || result.title,
-      author: req.body.author || result.author,
-      category: req.body.category || result.category,
-      stock: result.stock - 1
-      }
-      Book.update({_id: req.body.booklist}, {$set: bookUpdate}, {new: true}, (err, result)=>{
-        if(!err){
-          console.log(result)
-        } else {
-          console.log(err)
-        }
-      })
-    })
-    newTransaction.save((err, transaction)=>{
-      if(!err){
-        res.send(transaction)
+      if (result.stock == 0) {
+        res.send({massage: 'stock is empty'})
       } else {
-        rs.send(err)
+        var bookUpdate = {
+        isbn: req.body.isbn || result.isbn,
+        title: req.body.title || result.title,
+        author: req.body.author || result.author,
+        category: req.body.category || result.category,
+        stock: result.stock - 1
+        }
+        Book.update({_id: req.body.booklist}, {$set: bookUpdate}, {new: true}, (err, result)=>{
+          if(!err){
+            console.log(result)
+          } else {
+            console.log(err)
+          }
+        })
+        var newTransaction = new Transaction({
+          memberid: req.body.memberid,
+          days: req.body.days,
+          due_date: new Date(helper.dueDate(req.body.days)),
+          in_date: req.body.in_date,
+          fine: helper.countFine(req.body.in_date, req.body.days),
+          booklist: req.body.booklist
+        })
+
+        newTransaction.save((err, transaction)=>{
+          if(!err){
+            res.send(transaction)
+          } else {
+            rs.send(err)
+          }
+        })
       }
     })
   },
